@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ledger — Practice money before it's real.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDF2EA;
+    --paper-alt:#E2E9DD;
+    --ink:#1C2B24;
+    --ink-soft:#4A594F;
+    --rule:#B9C7BA;
+    --gain:#2F7A4D;
+    --loss:#B23A2E;
+    --brass:#A9823A;
+    --max:920px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    background-image:repeating-linear-gradient(to bottom, transparent, transparent 41px, var(--rule) 42px);
+  }
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+  a{ color:inherit; }
+  ::selection{ background:var(--brass); color:var(--paper); }
+
+  .wrap{ max-width:var(--max); margin:0 auto; padding:0 28px; }
+
+  header.top{
+    padding:32px 28px 0;
+    max-width:var(--max);
+    margin:0 auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+  }
+  .brand{ font-family:'Fraunces', serif; font-weight:600; font-size:1.15rem; letter-spacing:0.02em; }
+  .brand em{ font-style:italic; font-weight:300; color:var(--gain); }
+  .top nav a{ text-decoration:none; font-family:'IBM Plex Mono', monospace; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); margin-left:22px; }
+  .top nav a:hover{ color:var(--ink); }
+
+  /* HERO */
+  .hero{ padding:64px 28px 40px; }
+  .eyebrow{ font-family:'IBM Plex Mono', monospace; font-size:0.78rem; color:var(--brass); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:18px; }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(2.4rem, 5.4vw, 4.1rem);
+    line-height:1.04;
+    margin:0 0 22px;
+    max-width:12ch;
+  }
+  h1 i{ font-style:italic; font-weight:300; color:var(--gain); }
+  .lede{ font-size:1.15rem; color:var(--ink-soft); max-width:52ch; margin:0 0 40px; }
+
+  .calc{
+    border:1px solid var(--rule);
+    background:var(--paper-alt);
+    border-radius:2px;
+    padding:28px 28px 26px;
+    max-width:640px;
+  }
+  .calc-row{ display:flex; justify-content:space-between; align-items:baseline; font-family:'IBM Plex Mono', monospace; font-size:0.82rem; color:var(--ink-soft); margin-bottom:8px; }
+  .calc-row span:last-child{ color:var(--ink); font-weight:500; }
+  input[type=range]{
+    width:100%; margin:10px 0 22px; accent-color:var(--gain); cursor:pointer;
+  }
+  .calc-result{ border-top:1px dashed var(--rule); padding-top:18px; display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:12px; }
+  .calc-result .label{ font-family:'IBM Plex Mono', monospace; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); }
+  .calc-result .tally{ font-family:'IBM Plex Mono', monospace; font-size:2.1rem; font-weight:500; font-variant-numeric:tabular-nums; color:var(--gain); }
+  .calc-note{ font-size:0.82rem; color:var(--ink-soft); margin-top:14px; }
+
+  /* ENTRIES (sections) */
+  .entry{ padding:64px 28px; border-top:1px solid var(--rule); }
+  .entry-head{ display:flex; gap:18px; align-items:baseline; margin-bottom:26px; flex-wrap:wrap; }
+  .entry-code{ font-family:'IBM Plex Mono', monospace; font-size:0.78rem; color:var(--brass); letter-spacing:0.08em; }
+  .entry-date{ font-family:'IBM Plex Mono', monospace; font-size:0.78rem; color:var(--ink-soft); }
+  h2{ font-family:'Fraunces', serif; font-weight:500; font-size:clamp(1.6rem,3vw,2.2rem); margin:0 0 22px; max-width:20ch; }
+
+  .stat-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:26px; margin:28px 0 6px; }
+  .stat{ border-left:2px solid var(--loss); padding-left:14px; }
+  .stat.up{ border-left-color:var(--gain); }
+  .stat .num{ font-family:'IBM Plex Mono', monospace; font-size:1.9rem; font-weight:600; }
+  .stat .cap{ font-size:0.85rem; color:var(--ink-soft); }
+
+  .feature-list{ list-style:none; margin:0; padding:0; display:grid; gap:0; }
+  .feature-list li{ display:flex; gap:18px; padding:18px 0; border-top:1px dashed var(--rule); }
+  .feature-list li:first-child{ border-top:none; }
+  .flabel{ font-family:'IBM Plex Mono', monospace; font-size:0.78rem; color:var(--brass); min-width:88px; padding-top:2px; }
+  .fbody h3{ font-family:'Work Sans',sans-serif; font-weight:600; font-size:1.05rem; margin:0 0 4px; }
+  .fbody p{ margin:0; color:var(--ink-soft); font-size:0.95rem; max-width:56ch; }
+
+  .ledger-table{ width:100%; border-collapse:collapse; font-family:'IBM Plex Mono', monospace; font-size:0.85rem; margin-top:10px; }
+  .ledger-table th{ text-align:left; text-transform:uppercase; letter-spacing:0.06em; font-size:0.72rem; color:var(--ink-soft); font-weight:500; padding:8px 10px; border-bottom:1px solid var(--ink); }
+  .ledger-table td{ padding:12px 10px; border-bottom:1px solid var(--rule); vertical-align:top; }
+  .ledger-table .credit{ color:var(--gain); }
+  .ledger-table .debit{ color:var(--loss); }
+
+  .quote{ font-family:'Fraunces', serif; font-style:italic; font-weight:300; font-size:1.3rem; color:var(--ink); max-width:44ch; margin:24px 0; line-height:1.4; }
+  .quote span{ display:block; font-family:'IBM Plex Mono', monospace; font-style:normal; font-size:0.78rem; color:var(--ink-soft); margin-top:10px; }
+
+  footer{ padding:56px 28px 60px; border-top:1px solid var(--rule); }
+  .cta-box{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px; }
+  .cta-box h2{ margin:0; }
+  .btn{
+    font-family:'IBM Plex Mono', monospace; text-transform:uppercase; letter-spacing:0.08em; font-size:0.82rem;
+    background:var(--ink); color:var(--paper); border:none; padding:15px 26px; border-radius:2px; cursor:pointer;
+    text-decoration:none; display:inline-block;
+  }
+  .btn:hover{ background:var(--gain); }
+  .btn:focus-visible, a:focus-visible, input:focus-visible{ outline:2px solid var(--brass); outline-offset:3px; }
+  .fine{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:var(--ink-soft); margin-top:36px; }
+
+  @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
+  @media (max-width:600px){
+    .entry, .hero{ padding-left:20px; padding-right:20px; }
+    .cta-box{ flex-direction:column; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">LEDGER<em>.</em></div>
+  <nav>
+    <a href="#problem">Problem</a>
+    <a href="#how">How it works</a>
+    <a href="#model">Business model</a>
+    <a href="#join">Join</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">A student-built financial literacy platform</div>
+  <h1>Practice money <i>before</i> it's real.</h1>
+  <p class="lede">Ledger teaches budgeting and investing the way you'd actually learn it — by doing it, with simulated money, real market data, and zero risk of wiping out your savings on lesson one.</p>
+
+  <div class="calc" role="group" aria-label="Compounding calculator">
+    <div class="calc-row"><span>Monthly amount invested</span><span id="amtOut" class="mono">₹1,000</span></div>
+    <input type="range" id="amt" min="200" max="10000" step="100" value="1000" aria-label="Monthly investment amount">
+    <div class="calc-row"><span>Years invested</span><span id="yrsOut" class="mono">10 years</span></div>
+    <input type="range" id="yrs" min="1" max="20" step="1" value="10" aria-label="Number of years">
+    <div class="calc-result">
+      <div>
+        <div class="label">Estimated value at 12% annual return</div>
+        <div class="tally mono" id="tally">₹2,32,339</div>
+      </div>
+      <div class="label" id="investedOut">You invested ₹1,20,000 of that</div>
+    </div>
+    <p class="calc-note">This is the exact kind of calculation most students never get to run before their first real financial decision — the entire premise of Ledger.</p>
+  </div>
+</section>
+
+<section class="entry" id="problem">
+  <div class="entry-head">
+    <span class="entry-code">ENTRY — 001</span>
+    <span class="entry-date">The problem</span>
+  </div>
+  <h2>Access is growing faster than understanding.</h2>
+  <p>More students than ever have a UPI app, a demat account, or a trading app on their phone. Almost none of them were taught what to do with it.</p>
+  <div class="stat-grid">
+    <div class="stat"><div class="num">24%</div><div class="cap">of India's population is financially literate (S&amp;P Global FinLit Survey)</div></div>
+    <div class="stat"><div class="num">40% <span class="mono" style="font-size:1rem;">vs</span> 27%</div><div class="cap">urban vs. rural financial literacy rate in India</div></div>
+    <div class="stat up"><div class="num">2×</div><div class="cap">more likely to save for retirement if financially literate (FINRA)</div></div>
+    <div class="stat"><div class="num">28%</div><div class="cap">average literacy rate across major emerging economies</div></div>
+  </div>
+  <p class="quote">"Financially literate individuals are consistently better at saving, investing, and planning for the future — the knowledge gap is a wealth gap in slow motion."<span>— Synthesis of Lusardi &amp; Mitchell's financial literacy research</span></p>
+</section>
+
+<section class="entry" id="how">
+  <div class="entry-head">
+    <span class="entry-code">ENTRY — 002</span>
+    <span class="entry-date">How it works</span>
+  </div>
+  <h2>Three modules. One running ledger.</h2>
+  <ul class="feature-list">
+    <li>
+      <div class="flabel">LEARN</div>
+      <div class="fbody"><h3>Bite-sized financial fundamentals</h3><p>Budgeting, credit, taxes, and investing basics, taught through short interactive lessons — not a textbook chapter.</p></div>
+    </li>
+    <li>
+      <div class="flabel">PRACTICE</div>
+      <div class="fbody"><h3>A simulated trading &amp; investing engine</h3><p>Students get virtual capital and trade against real, live market data — same mechanics as a real brokerage, none of the real-money risk.</p></div>
+    </li>
+    <li>
+      <div class="flabel">TRACK</div>
+      <div class="fbody"><h3>A personal ledger of every decision</h3><p>Every simulated trade and budgeting choice is logged, so students can see the actual consequences of their financial decisions over time.</p></div>
+    </li>
+  </ul>
+</section>
+
+<section class="entry" id="model">
+  <div class="entry-head">
+    <span class="entry-code">ENTRY — 003</span>
+    <span class="entry-date">The business model</span>
+  </div>
+  <h2>Built to sustain itself, like a real fintech would.</h2>
+  <p>Ledger isn't a licensed brokerage — that requires regulatory approval no student project can obtain. Instead, it's designed the way a real fintech founder would design around that constraint:</p>
+  <table class="ledger-table">
+    <thead><tr><th>Revenue line</th><th>Mechanism</th><th>Type</th></tr></thead>
+    <tbody>
+      <tr><td>Freemium subscription</td><td>Free core platform; paid tier unlocks advanced simulations and analytics</td><td class="credit">Credit</td></tr>
+      <tr><td>Broker referral partnerships</td><td>Affiliate revenue when users graduate to a real, licensed brokerage partner</td><td class="credit">Credit</td></tr>
+      <tr><td>School licensing</td><td>Flat-fee access for schools using Ledger as a supplementary curriculum tool</td><td class="credit">Credit</td></tr>
+      <tr><td>Market data &amp; hosting</td><td>Live pricing feed, servers, and content development</td><td class="debit">Debit</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<footer id="join">
+  <div class="cta-box">
+    <h2>Ready to open your first ledger?</h2>
+    <a class="btn" href="mailto:hello@ledger-project.example">Join the pilot</a>
+  </div>
+  <div class="fine mono">LEDGER — A STUDENT-FOUNDED FINANCIAL LITERACY INITIATIVE · CONCEPT PROTOTYPE</div>
+</footer>
+
+<script>
+  const amt = document.getElementById('amt');
+  const yrs = document.getElementById('yrs');
+  const amtOut = document.getElementById('amtOut');
+  const yrsOut = document.getElementById('yrsOut');
+  const tally = document.getElementById('tally');
+  const investedOut = document.getElementById('investedOut');
+  const rupee = n => '₹' + Math.round(n).toLocaleString('en-IN');
+
+  function calc(){
+    const monthly = parseFloat(amt.value);
+    const years = parseFloat(yrs.value);
+    const rate = 0.12;
+    const months = years * 12;
+    const r = rate / 12;
+    const fv = monthly * ((Math.pow(1 + r, months) - 1) / r) * (1 + r);
+    const invested = monthly * months;
+    amtOut.textContent = rupee(monthly);
+    yrsOut.textContent = years + (years === 1 ? ' year' : ' years');
+    tally.textContent = rupee(fv);
+    investedOut.textContent = 'You invested ' + rupee(invested) + ' of that';
+  }
+  amt.addEventListener('input', calc);
+  yrs.addEventListener('input', calc);
+  calc();
+</script>
+
+</body>
+</html>
